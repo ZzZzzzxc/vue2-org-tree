@@ -2,7 +2,7 @@
   <div id="app">
     <Tree
       @labelClick="log"
-      :data="data"
+      v-model="data"
       :format="format"
       :customLabel="renderLabel"
     />
@@ -46,12 +46,18 @@ export default {
       },
     };
   },
+  watch: {
+    data: {
+      deep: true,
+      handler: data => console.log(data),
+    },
+  },
   methods: {
     renderLabel(data) {
       return <div>{data.name}</div>;
     },
-    log(data) {
-      console.log(data);
+    log() {
+      // console.log(data);
     },
   },
 };

@@ -1,9 +1,15 @@
 <script>
 const EVENTS = {
   click: "labelClick",
+  change: "dataChange",
 };
+let draggable = null;
 export default {
   name: "Node",
+  model: {
+    prop: "data",
+    event: EVENTS.change,
+  },
   props: {
     data: {
       type: Object,
@@ -18,8 +24,46 @@ export default {
     };
   },
   methods: {
+    onNodeClick(...args) {
+      this.$emit(EVENTS.click, ...args);
+    },
+    onDataChange(data) {
+      this.$emit(EVENTS.change, data);
+    },
     toggleShow() {
       this.show = !this.show;
+    },
+    handleDragStart() {
+      draggable = this;
+    },
+    handleDrag() {},
+    handleDragend() {},
+    handleEnter(e) {
+      e.preventDefault();
+    },
+    handleOver(e) {
+      e.preventDefault();
+    },
+    handleLeave() {},
+    handleDrop(e) {
+      if (draggable._uid === 2) return;
+      const { label, children } = this.format;
+      // console.log("被拖拽元素：");
+      // console.log(draggable);
+      // console.log("被拖拽元素的父级元素：");
+      // console.log(draggable.$parent);
+      const index = draggable.$parent.data[children].findIndex(child => {
+        return child[label] === draggable.data[label];
+      });
+      draggable.$parent.data[children].splice(index, 1);
+      // console.log("目的元素：");
+      // console.log(this);
+      if (this.data[children]) {
+        this.data[children].push(draggable.data);
+      } else {
+        this.$set(this.data, children, [draggable.data]);
+      }
+      e.preventDefault();
     },
     renderHandleBtn() {
       return (
@@ -33,9 +77,17 @@ export default {
       const { label } = format;
       return (
         <div
+          ref="drag"
           class="label"
           draggable={true}
-          onClick={() => this.$emit(EVENTS.click, data)}
+          onClick={() => this.onNodeClick(data)}
+          onDragstart={this.handleDragStart}
+          onDrag={this.handleDrag}
+          onDragend={this.handleDragend}
+          onDragenter={this.handleEnter}
+          onDragover={this.handleOver}
+          onDragleave={this.handleLeave}
+          onDrop={this.handleDrop}
         >
           {customLabel ? customLabel(data) : data[label]}
           {this.renderHandleBtn()}
@@ -49,21 +101,27 @@ export default {
       return data[children] ? (
         <div
           class="children"
-          style={this.show ? "display:table" : "display:none"}
+          style={
+            this.show && data[children] && data[children].length
+              ? "display:table"
+              : "display:none"
+          }
         >
           {data[children].map(child => (
             <Node
               customLabel={customLabel}
-              class={child[children] ? "" : "leaf"}
+              class={child[children] && child[children].length ? "" : "leaf"}
               data={child}
               format={format}
               onLabelClick={labelClick}
+              onDataChange={this.onDataChange}
             />
           ))}
         </div>
       ) : null;
     },
   },
+  mounted() {},
   render() {
     return (
       <div class="node">
