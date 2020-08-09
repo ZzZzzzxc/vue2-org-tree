@@ -52,6 +52,7 @@ export default {
       // console.log(draggable);
       // console.log("被拖拽元素的父级元素：");
       // console.log(draggable.$parent);
+      if (draggable.$parent === this) return; // 目的元素为自身父元素
       const index = draggable.$parent.data[children].findIndex(child => {
         return child[label] === draggable.data[label];
       });
