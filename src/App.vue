@@ -1,18 +1,59 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <Tree
+      @labelClick="log"
+      :data="data"
+      :format="format"
+      :customLabel="renderLabel"
+    />
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import { Tree } from "./components";
 
 export default {
   name: "App",
   components: {
-    HelloWorld
-  }
+    Tree,
+  },
+  data() {
+    return {
+      data: {
+        name: "一级",
+        list: [
+          {
+            name: `二级-1`,
+          },
+          {
+            name: `二级-2`,
+            list: [{ name: `三级-1` }, { name: `三级-2` }],
+          },
+          {
+            name: `二级-3`,
+            list: [
+              { name: `三级-3` },
+              { name: `三级-4` },
+              { name: `三级-5` },
+              { name: `三级-6` },
+            ],
+          },
+        ],
+      },
+      format: {
+        label: "name",
+        children: "list",
+      },
+    };
+  },
+  methods: {
+    renderLabel(data) {
+      return <div>{data.name}</div>;
+    },
+    log(data) {
+      console.log(data);
+    },
+  },
 };
 </script>
 
