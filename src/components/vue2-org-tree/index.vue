@@ -38,27 +38,23 @@ export default {
     },
     handleDrag() {},
     handleDragend() {},
-    handleEnter(e) {
-      e.preventDefault();
-    },
+    handleEnter() {},
     handleOver(e) {
+      // draggable 被拖拽元素 this 目的元素
+      // 目的地为拖拽元素的子元素
+      if (draggable.$el.contains(this.$el)) return;
       e.preventDefault();
     },
     handleLeave() {},
     handleDrop(e) {
-      if (draggable._uid === 2) return;
+      // draggable 被拖拽元素 this 目的元素
       const { label, children } = this.format;
-      // console.log("被拖拽元素：");
-      // console.log(draggable);
-      // console.log("被拖拽元素的父级元素：");
-      // console.log(draggable.$parent);
-      if (draggable.$parent === this) return; // 目的元素为自身父元素
+      // 从出发点移除被移动元素
       const index = draggable.$parent.data[children].findIndex(child => {
         return child[label] === draggable.data[label];
       });
       draggable.$parent.data[children].splice(index, 1);
-      // console.log("目的元素：");
-      // console.log(this);
+      // 目的地新增被移动元素
       if (this.data[children]) {
         this.data[children].push(draggable.data);
       } else {
